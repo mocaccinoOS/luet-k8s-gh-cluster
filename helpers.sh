@@ -3,7 +3,7 @@
 start_vpn() {
     curl https://get.mocaccino.org/luet/get_luet_root.sh | sudo sh
     sudo luet install -y repository/mocaccino-extra
-    sudo luet install -y utils/edgevpn container/k3s
+    sudo luet install -y utils/edgevpn container/k3s container/kubectl
     echo "$EDGEVPN" | base64 -d > config.yaml
     sudo -E EDGEVPNCONFIG=config.yaml IFACE=edgevpn0 edgevpn > /dev/null 2>&1 &
 }
@@ -39,7 +39,6 @@ start_server() {
         sleep 1
     done
 
-    sudo cat /etc/rancher/k3s/k3s.yaml
     sudo luet serve-repo --address $IP --dir /var/lib/rancher/k3s/server/ &
     sudo luet serve-repo --address $IP --port 9091 --dir /etc/rancher/k3s 
 }
@@ -70,4 +69,5 @@ start_jumpbox() {
 prepare_jumpbox() {
     wait_master
     curl http://10.1.0.20:9091/k3s.yaml | sed 's/127\.0\.0\.1/10.1.0.20/g' > k3s.yaml
+    KUBECONFIG=$PWD/k3s.yaml kubectl apply -f https://raw.githubusercontent.com/mudler/luet-k8s/master/hack/kube.yaml
 }
