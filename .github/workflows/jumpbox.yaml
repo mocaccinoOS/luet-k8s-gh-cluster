@@ -2,8 +2,7 @@ name: Jumpbox
 
 on:
   push:
-  schedule:    
-  - cron: "0 */6 * * *"
+
 concurrency: 
   group: jumpbox-${{ github.head_ref || github.ref }}-${{ github.repository }}
 jobs:
